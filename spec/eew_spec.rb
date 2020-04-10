@@ -1,9 +1,5 @@
-RSpec.describe Eew do
+RSpec.describe EEW do
   it "has a version number" do
-    expect(Eew::VERSION).not_to be nil
-  end
-
-  it "does something useful" do
-    expect(false).to eq(true)
+    expect(EEW::VERSION).not_to be nil
   end
 end

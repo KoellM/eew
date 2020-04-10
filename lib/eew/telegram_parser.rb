@@ -1,10 +1,10 @@
 # frozen_string_literal: true
-
+require "stringio"
 module EEW
   class TelegramParser
     attr_reader :code, :header, :body
-    def initialize(socket)
-      @telegram = socket
+    def initialize(socket, headers)
+      @telegram = StringIO.new(socket.read(headers.length))
       parse!
     end
 

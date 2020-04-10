@@ -22,21 +22,22 @@ module EEW
       @id = id
       @password = password
       @terminal_id = terminal_id
-      @ip, @port = get_server_list
     end
 
     # 连接服务器
     # @param ip [String] IP
     # @param port [String] Port
     # [yield] headers, telegram
-    def connect(ip = @ip, port = @port)
+    def connect(ip = nil, port = nil)
+      ip, port = get_server_list if ip.nil? && port.nil?
       socket = TCPSocket.open(ip, port)
+      socket.setsockopt(Socket::SOL_SOCKET, Socket::SO_KEEPALIVE, true)
       socket.print(get_req)
 
       result = HTTPHeader.new(socket.readline("\n\n"))
 
       if result.login?
-        @log.info("authentication success. Server: #{@ip}:#{@port}")
+        @log.info("authentication success. Server: #{ip}:#{port}")
       else
         raise Authentication, 'authentication failed.'
       end
@@ -44,10 +45,10 @@ module EEW
       while data = socket.readline("\n\n")
         headers = HTTPHeader.new(data)
         if headers.data?
-          telegram = TelegramParser.new(socket)
-          yield(headers, telegram)
+          telegram = TelegramParser.new(socket, headers)
+          yield(telegram, headers)
         else
-          yield(headers, nil)
+          yield(nil, headers)
         end
       end
     end

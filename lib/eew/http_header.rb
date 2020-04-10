@@ -1,4 +1,5 @@
 # frozen_string_literal: true
+require "time"
 
 module EEW
   class HTTPHeader
@@ -7,7 +8,7 @@ module EEW
     end
 
     def length
-      headers['Content-Length']
+      headers['Content-Length'].to_i
     end
 
     def login?
@@ -27,7 +28,7 @@ module EEW
     end
 
     def time
-      headers['X-WNI-Time']
+      Time.parse(headers['X-WNI-Time'] + " UTC")
     end
 
     def headers
