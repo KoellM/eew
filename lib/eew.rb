@@ -2,25 +2,27 @@
 
 require 'socket'
 require 'open-uri'
+require 'digest/md5'
 require 'eew/version'
 require 'eew/http_header'
 require 'eew/telegram_parser'
 require 'eew/log'
 
 module EEW
-  class Authentication < StandardError; end
+  class AuthenticationError < StandardError; end
+  class Error < StandardError; end
   # Socket 连接处理
   class Client
     # 初始化
     # @param id [String] 邮箱
-    # @param password [String] MD5 密码
+    # @param password [String] 密码
     # @param terminal_id [String] Terminal ID
     # @param log [Logger] Logger
     # @return [void]
     def initialize(id, password, terminal_id, log = Log.new)
       @log = log
       @id = id
-      @password = password
+      @password = Digest::MD5.hexdigest(password)
       @terminal_id = terminal_id
     end
 
@@ -39,7 +41,7 @@ module EEW
       if result.login?
         @log.info("authentication success. Server: #{ip}:#{port}")
       else
-        raise Authentication, 'authentication failed.'
+        raise AuthenticationError, 'authentication failed.'
       end
 
       while data = socket.readline("\n\n")

@@ -10,13 +10,13 @@ $ rake install
 require "eew"
 
 email = ""
-password = "" # 需要MD5
-tid = ""
+password = ""
+terminal_id = ""
 
-eew = EEW::Client.new(email, password, tid)
+eew = EEW::Client.new(email, password, terminal_id)
 
-eew.connect do |headers, telegram|
-  if headers.data? # Telegram
+eew.connect do |telegram, headers|
+  if telegram # Telegram
     puts "Header: #{telegram.header}"
     puts "Body\n#{telegram.body}"
   else
